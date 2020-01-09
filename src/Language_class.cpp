@@ -64,6 +64,11 @@ void Language::print_data() {
 	}
 }
 
-Word Language::get_main_form(string &word) {
-	return this->main_form_getter[word];
+pair<bool, Word> Language::get_main_form(string &word) {
+	bool success;
+	if (main_form_getter.find(word) == main_form_getter.end()) {
+		success = false;
+		return pair(success, Word());
+	}
+	return pair(success, this->main_form_getter[word]);
 }

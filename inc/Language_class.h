@@ -14,7 +14,7 @@ class Language {
 public:
 	Language(const char filename[] = "res/");
 	void print_data();
-	Word get_main_form(string &word);
+	pair<bool, Word> get_main_form(string &word);
 
 	// Main map
 	map<string, Word> main_form_getter;

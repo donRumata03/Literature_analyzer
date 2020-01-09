@@ -4,13 +4,20 @@ using namespace std;
 namespace fs = filesystem;
 
 int main() {
+	system("chcp 1251");
+	system("cls");
 	setlocale(LC_ALL, "Russian");
 	
 	Language russian("res/language/input/little_test_data.txt");
 	// russian.print_data();
 
-	string my_word = "абажурами";
-	Word main_form = russian.get_main_form(my_word);
+	char my_word [] = "абонировать";
+
+	string my_string(my_word);
+	// cin >> my_string;
+
+	auto[success, main_form] = russian.get_main_form(my_string);
+	cout << success << endl;
 	main_form.print_data();
 
 	/*
