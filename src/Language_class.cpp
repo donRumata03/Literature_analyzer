@@ -21,20 +21,31 @@ Language::Language(const char filename[]) {
 				for_block.push_back(single_data[i]);
 			}
 
-			vector<string> vec_for_block = split(for_block);
+			vector<string> vec_for_block = split_lines(for_block);
 
 			
 
 			for (string for_word : vec_for_block) {
-				Word next_word(for_word);
-				if (next_word.word_type == this->word_blocks.back().word_type) { // Append to existing block
-					this->word_blocks.back().append_word(next_word);
-				}
-				else { // Print the previous block and create th next one
-					this->word_blocks.back().print_words();
+				Word next_word(for_word); // If it`s the first block
+				if (this->word_blocks.empty()) {
 					this->word_blocks.emplace_back();
 					this->word_blocks.back().append_word(next_word);
+					this->main_form_getter[next_word.data] = (this->word_blocks.back().main_form);
 				}
+				else if (next_word.word_type == this->word_blocks.back().word_type) { // Append to existing block
+					this->word_blocks.back().append_word(next_word);
+					this->main_form_getter[next_word.data] = (this->word_blocks.back().main_form);
+				}
+				else { // Print the previous block and create the next one
+					this->word_blocks.emplace_back();
+					this->word_blocks.back().append_word(next_word);
+					this->main_form_getter[next_word.data] = (this->word_blocks.back().main_form);
+				}
+				/*
+				cout << next_word.data << " -> ";
+				this->main_form_getter[next_word.data].print_data();
+				cout << endl;
+				*/
 			}
 
 
@@ -51,4 +62,8 @@ void Language::print_data() {
 	for (auto block : word_blocks) {
 		block.print_words();
 	}
+}
+
+Word Language::get_main_form(string &word) {
+	return this->main_form_getter[word];
 }

@@ -21,17 +21,25 @@ Word_family::Word_family(string &s) {
 
 bool Word_family::append_word(Word &word)
 {
-	if (this->word_type == word_types::unknown) { this->words.push_back(word); this->word_type = word.word_type; this->main_form = word; return; }
+	if (this->word_type == word_types::unknown) { 
+		this->words.push_back(word); 
+		this->word_type = word.word_type; 
+		this->main_form = word; 
+		return true; 
+	}
 	if (word.word_type != this->word_type) {
 		throw "Bad word type \"" + word_type_to_string_converter[word.word_type] \
 			+ "\" for block with word type \"" + word_type_to_string_converter[this->word_type];
 		return false;
 	}
 	this->words.push_back(word);
+	return true;
 }
 
 void Word_family::print_words() {
-	cout << "Word family: Word type: " << word_type_to_string_converter[word_type] << " { " << endl;
+	cout << "Word family: \nWord type: " << word_type_to_string_converter[word_type] << "; Main form: ";
+	this->main_form.print_data();
+	cout << "{ " << endl;
 	for (Word this_word : words)
 		this_word.print_data("\t");
 	cout << endl;

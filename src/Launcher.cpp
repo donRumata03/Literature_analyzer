@@ -6,8 +6,12 @@ namespace fs = filesystem;
 int main() {
 	setlocale(LC_ALL, "Russian");
 	
-	Language russian("res/language/input/data.txt");
-	russian.print_data();
+	Language russian("res/language/input/little_test_data.txt");
+	// russian.print_data();
+
+	string my_word = "абажурами";
+	Word main_form = russian.get_main_form(my_word);
+	main_form.print_data();
 
 	/*
 	string for_block = "верхолаз	сущ одуш ед муж им	127523\n\

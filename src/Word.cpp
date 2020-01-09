@@ -3,6 +3,10 @@
 // Word to enums convertors:
 
 
+// Free characteristics
+
+
+
 // Type:
 map<string, word_types> string_to_word_type_converter{
 	{"союз", word_types::conjunction},
@@ -27,7 +31,7 @@ map<string, word_types> string_to_word_type_converter{
 map<word_types, string> word_type_to_string_converter{
 	{word_types::unknown, "НЕИЗВЕСТНАЯ ЧАСТЬ РЕЧИ"},
 	{word_types::conjunction, "Союз"},
-	{word_types::noun, "Пуществительное"},
+	{word_types::noun, "Существительное"},
 	{word_types::predicate, "Предикакив" },
 	{word_types::particle, "Частица" },
 	{word_types::interjection, "Междометие" },

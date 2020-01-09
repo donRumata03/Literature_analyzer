@@ -5,7 +5,10 @@
 #include "Language.h"
 
 
+enum class free_properties : int // Независимые свойства слова
+{
 
+};
 
 
 enum class word_types : int {	// Части речи:
