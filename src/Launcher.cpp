@@ -3,40 +3,81 @@
 using namespace std;
 namespace fs = filesystem;
 
+constexpr auto russian_path = "res/language/input/data.txt";
+constexpr auto test_path = "res/language/input/little_test_data.txt";
+
 int main() {
 	system("chcp 1251");
 	system("cls");
 	setlocale(LC_ALL, "Russian");
 	
-	Language russian("res/language/input/little_test_data.txt");
+
+	Timer language_load_tim("Language load: ", true);
+	Language russian(russian_path);
+	
+	language_load_tim.~Timer(); // Prints name
+
+	
+	russian.print_word_type_stat();
+	russian.print_frequent_prefixes(100);
+	russian.print_frequent_postfixes(100);
+	
 	// russian.print_data();
 
-	char my_word [] = "абонировать";
+	// Benchmark: (outdated)
+	/*
+	int max_word_index = russian.main_form_getter.size();
+	cout << max_word_index << endl;
 
-	string my_string(my_word);
-	// cin >> my_string;
+	luint number_of_runnings = 10;
 
-	auto[success, main_form] = russian.get_main_form(my_string);
-	cout << success << endl;
-	main_form.print_data();
+	double time_counter = 0;
+
+	for (int i = 0; i < number_of_runnings; i++) {
+		luint this_word_index = (static_cast<luint>(rand()) << 8 | static_cast<luint>(rand())) % max_word_index;
+		string this_word;
+		int index = 0;
+		for (auto j : russian.main_form_getter) {
+			if (index == this_word_index) {
+				this_word = j.first;
+				break;
+			}
+			index++;
+		}
+		cout << "This word = " << this_word << endl;
+		Timer t("", false);
+		auto[success, this__word]  = russian.get_main_form(this_word);
+		double time_took = t.get_time();
+		cout << "This_time: " << time_took << " ms" << endl;
+		time_counter += time_took;
+	}
+
+	cout << "Average time of getting: " << time_counter / number_of_runnings << " ms" << endl;
+
+	*/
+
+	// User interface: family getter
 
 	/*
-	string for_block = "верхолаз	сущ одуш ед муж им	127523\n\
-		верхолаза	сущ одуш ед муж род	226781\n\
-		верхолазу	сущ одуш ед муж дат	226782\n\
-		верхолаза	сущ одуш ед муж вин	226783\n\
-		верхолазом	сущ одуш ед муж тв	226784\n\
-		верхолазе	сущ одуш ед муж пр	226785\n\
-		верхолазы	сущ одуш мн им	1273054\n\
-		верхолазов	сущ одуш мн род	1273055\n\
-		верхолазам	сущ одуш мн дат	1273056\n\
-		верхолазов	сущ одуш мн вин	1273057\n\
-		верхолазами	сущ одуш мн тв	1273058\n\
-		верхолазах	сущ одуш мн пр	1273059";
+	string my_string;
 
-	Word_family my_word_family(for_block);
-	my_word_family.print_words();
+	while (cin >> my_string) {
+		auto [success, word_block] = russian.get_family(my_string);
+		cout << (success ? ("Well, I know this word... It`s root is") : ("I don`t know this word!")) << endl;
+		if (success) { word_block->print_words(); }
+		else cout << "Try again!!!!" << endl;
+	}
 
+	*/
+
+	// User interface: word divider
+	string user_word;
+	while(cin >> user_word)
+	{
+		russian.analyze_word(user_word).print();
+	}
+	
+	/*
 	
 	const fs::path workdir = fs::current_path();
 	cout << workdir;

@@ -62,7 +62,7 @@ std::string readFile(const char filename []) {
 	{
 		std::string contents;
 		in.seekg(0, std::ios::end);
-		contents.resize((const unsigned int)in.tellg());
+		contents.resize(static_cast<const unsigned int>(in.tellg()));
 		in.seekg(0, std::ios::beg);
 		in.read(&contents[0], contents.size());
 		in.close();
@@ -99,13 +99,38 @@ string cut_spaces(string &s) {
 	return s.substr(idx_start, idx_end - idx_start + 1);
 }
 
+string cut_bad_symbols(string& s)
+{
+	size_t idx_first = 0, idx_last = s.size();
+	for(size_t i = 0; i < s.length(); i++)
+	{
+		char c = s.at(i);
+		if (is_digit(c) || is_russian(c) || is_english(c))
+		{
+			idx_first = i;
+			break;
+		}
+	}
+
+	for (long long i = s.length() - 1; i >= 0; i--)
+	{
+		char c = s.at(i);
+		if (is_digit(c) || is_russian(c) || is_english(c)) {
+			idx_last = i + 1;
+			break;
+		}
+	}
+
+	return Slice(s, idx_first, idx_last);
+}
+
 
 vector<string> split(string &s, initializer_list<char> &split_by) {
 	vector<string> result;
 	uint last_word_beg = 0;
 	bool in_word = false;
 	uint index = 0, len = s.length();
-	uint this_length;
+	size_t this_length;
 	for (char c : s) {
 		if (in(c, split_by)) { // Word spliter detected!
 			if (in_word) { // end word
@@ -134,7 +159,7 @@ vector<string> split(string &s, initializer_list<char> &split_by) {
 		index++;
 	}
 
-	if (!in(s[len], split_by)) { // // add last word
+	if (!in(s[len - 1], split_by)) { // // add last word
 		this_length = index - last_word_beg;
 		string this_word;
 		this_word.reserve(this_length);
@@ -148,11 +173,11 @@ vector<string> split(string &s, initializer_list<char> &split_by) {
 }
 
 template<>
-string join<vector<string>>(string splitter, vector<string>& container) {
-	string res = "";
-	int counter = 0;
+string join<vector<string>>(const string splitter, vector<string>& container) {
+	string res;
+	uint counter = 0;
 	res.reserve(2 * container.size() * max(container.at(0).length(), container.at(1).length()));
-	for (auto i : container) { res += i; if (counter != container.size() - 1) { res += splitter; } counter++; }
+	for (const auto &i : container) { res += i; if (counter != container.size() - 1) { res += splitter; } counter++; }
 	return res;
 }
 

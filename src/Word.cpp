@@ -4,14 +4,22 @@
 
 
 // Free characteristics
+map<string, free_properties> string_to_free_properties_converter{
+	{"мод", free_properties::modal},
+	{"предик", free_properties::predicate}
+};
 
-
+// Backwards converter
+map<free_properties, string> free_properties_to_string_converter {
+	{free_properties::predicate, "Предикативный"},
+	{free_properties::modal, "Модальный"},
+	{free_properties::unknown, "НЕОПОЗНАННЫЙ"}
+};
 
 // Type:
 map<string, word_types> string_to_word_type_converter{
 	{"союз", word_types::conjunction},
 	{"сущ", word_types::noun},
-	{"предик", word_types::predicate},
 	{"част", word_types::particle},
 	{"межд", word_types::interjection},
 	{"прл", word_types::adjective},
@@ -32,7 +40,6 @@ map<word_types, string> word_type_to_string_converter{
 	{word_types::unknown, "НЕИЗВЕСТНАЯ ЧАСТЬ РЕЧИ"},
 	{word_types::conjunction, "Союз"},
 	{word_types::noun, "Существительное"},
-	{word_types::predicate, "Предикакив" },
 	{word_types::particle, "Частица" },
 	{word_types::interjection, "Междометие" },
 	{word_types::adjective, "Прилагательное" },
@@ -131,6 +138,7 @@ map<string, word_case> string_to_case_converter{
 Word::Word(string &s) {
 	raw_data = s;
 	vector<string> props = split(raw_data);
+	
 	int type_index = -1;
 	for (uint i = 0; i < props.size(); i++) {
 		for (auto prop : string_to_word_type_converter) {
@@ -144,6 +152,7 @@ Word::Word(string &s) {
 	data = Join(" ", Slice(props, 0, type_index));
 	raw_properties = Slice(props, type_index + 1, props.size());
 	word_type = string_to_word_type_converter[props.at(type_index)];
+
 	
 	if (is_digital(raw_properties.back())) {
 		frequency = stoll(raw_properties.back());
@@ -173,9 +182,13 @@ Word::Word(string &s) {
 }
 
 
-void Word::print_data(string tab) {
+void Word::print_data() {
 	cout << "Word: " << data << "; ";
 	cout << "Type: " << this->get_type() << "; ";
+	if(this->free_property != free_properties::unknown)
+	{
+		cout << "Has special props!!!: " << free_properties_to_string_converter[this->free_property] << endl;
+	}
 	cout << "Frequency: " << this->frequency << "; ";
 	cout << "Known properties: " << endl;
 	properties->print_data();
@@ -185,7 +198,7 @@ void Word::print_data(string tab) {
 	cout << "}" << endl;
 }
 
-string Word::get_type() {
+string Word::get_type() const {
 #ifndef HAS_word_type_to_string_converter
 	for (auto p : string_to_word_type_converter) {
 		if (p.second == word_type) {

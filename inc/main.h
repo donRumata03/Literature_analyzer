@@ -23,3 +23,4 @@
 #include "Timer.cpp"
 #include "statistics.cpp"
 #include "smoothing.cpp"
+#include "LCS.cpp"

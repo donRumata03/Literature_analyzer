@@ -7,7 +7,9 @@
 
 enum class free_properties : int // Независимые свойства слова
 {
-
+	unknown = -1,
+	modal,
+	predicate
 };
 
 
@@ -23,7 +25,6 @@ enum class word_types : int {	// Части речи:
 	conjunction,					// Союз
 	communion,						// Причастие
 	verb_communion,					// Деепричастие
-	predicate,						// Предикат
 	count,							// Числительное
 	pronoun,						// Местоимение
 	introduce,						// Вводное слово
@@ -71,6 +72,7 @@ enum class tence : int { // Время:
 };
 
 
+extern map<string, free_properties> string_to_free_properties_converter;
 extern map<string, word_types> string_to_word_type_converter;
 extern map<string, gender> string_to_gender_converter;
 extern map<string, quantity> string_to_quantity_converter;
@@ -79,7 +81,7 @@ extern map<string, tence> string_to_tence_converter;
 
 #define HAS_word_type_to_string_converter
 extern map<word_types, string> word_type_to_string_converter;
-// TODO: DEFINE
+extern map<free_properties, string> free_properties_to_string_converter;
 extern map<gender, string> gender_to_string_converter;
 extern map<quantity, string> quantity_to_string_converter;
 extern map<soulness, string> soulness_to_string_converter;
@@ -164,14 +166,15 @@ public:
 	vector<string> raw_properties;
 
 	string data;
-	word_types word_type;
+	word_types word_type = word_types::unknown;
 	word_properties* properties;
-	luint frequency;
+	free_properties free_property = free_properties::unknown;
+	long long frequency = -1;
 
 	Word() = default;
 	Word(string &s);
-	void print_data(string tab = "\t");
-	string get_type();
+	void print_data();
+	string get_type() const;
 };
 
 

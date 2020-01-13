@@ -131,5 +131,6 @@ template<class T> T Slice(T& container, uint idx_beg, uint idx_end) {
 // Strings:
 
 string cut_spaces(string& s);
+string cut_bad_symbols(string& s);
 vector<string> split(string &s, initializer_list<char> &split_by = *(new initializer_list({' ', '\n', '\t', '\r'})));
 vector<string> split_lines(string& s);

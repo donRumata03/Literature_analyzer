@@ -12,7 +12,8 @@
 #include <set>
 #include <tuple>
 #include <stack>
-
+#include <cstdlib>
+#include <unordered_map>
 
 
 // My libs:
@@ -25,6 +26,7 @@
 #include "Timer.h"
 #include "statistics.h"
 #include "smoothing.h"
+#include "LCS.h"
 
 
 using namespace std;

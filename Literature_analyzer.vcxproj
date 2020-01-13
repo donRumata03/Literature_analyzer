@@ -21,7 +21,7 @@
   <ItemGroup>
     <Text Include="res\Books\War_and_piece.txt" />
     <Text Include="res\Dads_and_kids.txt" />
-    <Text Include="res\language\input\Human_data.txt" />
+    <Text Include="res\language\input\data.txt" />
     <Text Include="res\lorem.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -120,7 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\cpp_func\;$(SolutionDir)res\;$(SolutionDir)inc\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\cpp_func;$(SolutionDir)inc\;D:\cpp_func\;$(SolutionDir)res\;$(SolutionDir)inc\</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>/std:c++17 %(AdditionalOptions)</AdditionalOptions>
@@ -137,6 +137,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\cpp_func;$(SolutionDir)inc\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,7 +155,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/std:c++17 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>D:\cpp_func\;$(SolutionDir)res\;$(SolutionDir)inc\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\cpp_func;$(SolutionDir)inc\;D:\cpp_func\;$(SolutionDir)res\;$(SolutionDir)inc\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,6 +173,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\cpp_func;$(SolutionDir)inc\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

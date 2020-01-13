@@ -24,7 +24,7 @@
     <Text Include="res\Books\War_and_piece.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
-    <Text Include="res\language\input\Human_data.txt">
+    <Text Include="res\language\input\data.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
   </ItemGroup>
