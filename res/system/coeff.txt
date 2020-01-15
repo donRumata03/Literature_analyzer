@@ -1,0 +1,2 @@
+word_top { 1.0 };
+simple_analitics {}

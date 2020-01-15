@@ -21,6 +21,7 @@ private:
 
 	double russian_percent, english_percent, digit_percent, water_part;
 public:
+	Simple_analitics() = default;
 	Simple_analitics(str &s);
 	Simple_analitics(str &s, string _label);
 

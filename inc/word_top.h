@@ -10,6 +10,7 @@ class word_top {
 	uint64_t size;
 	vector<pair<string, uint64_t>> data_sorted_by_num;
 public:
+	word_top() = default;
 	word_top(str& s);
 
 	void print_first(int n);

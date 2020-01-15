@@ -25,7 +25,7 @@ template<class T> void fill_ms(T* beg, long long len, T val);
 template<class T> void fill_ms(T* beg, const T* end, T val) {
 	while (beg != end) {
 		(*beg) = val;
-		beg++;
+		++beg;
 	}
 }
 
@@ -33,7 +33,7 @@ template<class T>
 void fill_ms(T* beg, long long len, T val) {
 	for (long _ = 0; _ < len; _++) {
 		(*beg) = val;
-		beg++;
+		++beg;
 	}
 }
 
@@ -47,10 +47,14 @@ bool is_in(const char& c, T resource) {
 	return false;
 }
 
-template<class T>
-bool in(T val, initializer_list<T>& lis) noexcept {
-	for (T i : lis) {
-		if (val == i) {
+
+template<class C, class T>
+bool in(T &val, C &container) noexcept
+{
+	for(auto& el : container)
+	{
+		if(el == val)
+		{
 			return true;
 		}
 	}
@@ -58,27 +62,6 @@ bool in(T val, initializer_list<T>& lis) noexcept {
 }
 
 
-template<class T>
-bool in(T &val, vector<T> &vec) noexcept {
-	for (T this_el : vec) {
-		if (this_el == val) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-template<class T, class E> 
-bool in(T& val, E& container) {
-	for (T el : container) {
-		if (el == val) {
-			return true;
-		}
-	}
-	return false;
-}
 
 
 
@@ -132,5 +115,70 @@ template<class T> T Slice(T& container, uint idx_beg, uint idx_end) {
 
 string cut_spaces(string& s);
 string cut_bad_symbols(string& s);
-vector<string> split(string &s, initializer_list<char> &split_by = *(new initializer_list({' ', '\n', '\t', '\r'})));
+vector<string> split(const string& s, const initializer_list<char>&& split_by = initializer_list{ ' ', '\n', '\t', '\r' });
 vector<string> split_lines(string& s);
+
+size_t find_first_not_english(string& s, size_t offset = 0);
+size_t find_first_russian(string& s, size_t offset = 0);
+
+
+template<class T> auto find_first_for_which_true(string& ss, T function, size_t offset = 0)
+{
+	for (size_t index = offset; index < ss.length(); index++)
+	{
+		if (function(ss[index]))
+		{
+			return index;
+		}
+	}
+	return string::npos;
+}
+
+
+template<class T, class E>
+auto my_lang_extract(string& s, T index_type_descriptor, E data_type_descriptor) -> map<string, vector<string>>
+{
+
+
+	
+	auto string_splitters = { '\n' };
+	size_t char_index = 0;
+	char c = s[0];
+
+	map<string, vector<string>> result;
+
+	while (char_index < s.size())
+	{
+		c = s[char_index];
+		if (c == '/') // It`s a comment string => find the next one
+		{
+			while (!in(c, string_splitters))
+			{
+				char_index++; c = s[char_index];
+			}
+			char_index = s.find_first_not_of(string_splitters, char_index);
+		}
+		else if (is_english(c))
+		{
+			// It`s the name of block
+			const size_t prev_index = char_index;
+			char_index = min(find_first_for_which_true(s, [&](auto& param) { return !index_type_descriptor(param); }, char_index), s.find('}', char_index));
+			c = s[char_index];
+			string this_name = Slice(s, prev_index, char_index);
+			size_t data_beg = find_first_for_which_true(s, data_type_descriptor, char_index);
+			size_t data_end = s.find('}', char_index);
+			auto data_to_split = Slice(s, data_beg, data_end);
+			auto data = split(data_to_split);
+
+			result[this_name] = data;
+
+			char_index = data_end;
+			c = s.at(char_index);
+		}
+		else {
+			char_index++;
+		}
+	}
+	return result;
+}
+

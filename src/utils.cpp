@@ -68,7 +68,8 @@ std::string readFile(const char filename []) {
 		in.close();
 		return(contents);
 	}
-	cout << "Can`t find file!!!" << endl;
+	cout << "Can`t find file!!! " << endl;
+	cout << "( " << filename << " )" << endl;
 	return "-1";
 }
 
@@ -125,7 +126,7 @@ string cut_bad_symbols(string& s)
 }
 
 
-vector<string> split(string &s, initializer_list<char> &split_by) {
+vector<string> split(const string &s, const initializer_list<char> &&split_by) {
 	vector<string> result;
 	uint last_word_beg = 0;
 	bool in_word = false;
@@ -168,9 +169,11 @@ vector<string> split(string &s, initializer_list<char> &split_by) {
 		}
 		result.push_back(this_word);
 	} 
-
-	return result;
+	if(!result.empty())	return result;
+	return vector<string>();
 }
+
+
 
 template<>
 string join<vector<string>>(const string splitter, vector<string>& container) {
@@ -183,6 +186,17 @@ string join<vector<string>>(const string splitter, vector<string>& container) {
 
 
 vector<string> split_lines(string& s) {
-	return split(s, *(new initializer_list<char>{ '\n' }));
+	return split(s, { '\n' });
+}
+
+
+
+size_t find_first_not_english(string& s, size_t offset)
+{
+	return find_first_for_which_true(s, [](char c) {	return !is_english(c); }, offset);
+}
+size_t find_first_russian(string& s, size_t offset)
+{
+	return find_first_for_which_true(s, [](char c) {	return is_russian(c); }, offset);
 }
 

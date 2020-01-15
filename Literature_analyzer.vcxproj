@@ -25,10 +25,14 @@
     <Text Include="res\lorem.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Analitics.cpp" />
+    <ClCompile Include="src\file_walker.cpp" />
     <ClCompile Include="src\file_worker.cpp" />
     <ClCompile Include="src\Language_class.cpp" />
     <ClCompile Include="src\Launcher.cpp" />
     <ClCompile Include="src\Language.cpp" />
+    <ClCompile Include="src\Matrix_optimize.cpp" />
+    <ClCompile Include="src\Scenery.cpp" />
     <ClCompile Include="src\Simple_analitics.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\str.cpp" />
@@ -37,11 +41,16 @@
     <ClCompile Include="src\word_top.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\Analitics.h" />
+    <ClInclude Include="inc\cpps.h" />
+    <ClInclude Include="inc\file_walker.h" />
     <ClInclude Include="inc\file_worker.h" />
     <ClInclude Include="inc\Language_class.h" />
     <ClInclude Include="inc\main.h" />
+    <ClInclude Include="inc\Matrix_optimize.h" />
     <ClInclude Include="inc\pch.h" />
     <ClInclude Include="inc\Language.h" />
+    <ClInclude Include="inc\Scenery.h" />
     <ClInclude Include="inc\Simple_analitics.h" />
     <ClInclude Include="inc\str.h" />
     <ClInclude Include="inc\utils.h" />
@@ -101,11 +110,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -116,7 +125,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -133,7 +142,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -147,7 +156,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -167,7 +176,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>

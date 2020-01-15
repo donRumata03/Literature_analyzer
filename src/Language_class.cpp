@@ -96,7 +96,7 @@ Language::Language(const char filename[]) {
 		char_index++;
 		
 		if(char_index == single_data.size()) {
-			_word_blocks.back().count_root();
+			string temp = _word_blocks.back().count_root();
 		}
 
 		previous_block_empty = this_block_empty;
@@ -188,6 +188,8 @@ Language::Language(const char filename[]) {
 	for(auto& p : postfixes_counter) if (p.second > MAX_IGNORE_NUMBER_OF_PREFIXES_AND_POSTFIXES) this->sorted_postfixes.emplace_back(p.first, p.second);
 	sort(sorted_prefixes.begin(), sorted_prefixes.end(), [](auto& a, auto& b) { return a.second > b.second; });
 	sort(sorted_postfixes.begin(), sorted_postfixes.end(), [](auto& a, auto& b) { return a.second > b.second; });
+
+	this->load_prestfixes();
 }
 
 word_common_struct Language::analyze_word(string& word)
@@ -217,7 +219,11 @@ word_common_struct Language::analyze_word(string& word)
 string Language::cut_prestfixes(string& word)
 {
 	string root = word;
-	while(!(get_root(root).first)) // If root in roots: return
+	size_t index = 0;
+
+	short times_no_success = 0;
+	
+	while(!root.empty() && !(is_main_form(root)) && times_no_success <= 3) // If root in roots: return
 	{
 		// For all frequent prefixes try to understand if they exist
 		// If they do, we add 1 to their frequency rating
@@ -225,6 +231,51 @@ string Language::cut_prestfixes(string& word)
 		//
 		// Each time we renew it we sort all known, good enough prepositions and find best ones
 		// But if we see something good it`s not necessary to wait re-counting
+
+		bool this_success = false;
+		
+		if(index == 0) // ending
+		{
+			for(auto& ending_type : endings)
+			for(string& ending : ending_type.second)
+			{
+				if(ends_with(root, ending))
+				{
+					if (root.size() >= 4 || ending.size() <= 2 || (static_cast<double>(root.size()) / ending.size() > 2.5)) {
+						root = root.substr(0, root.size() - ending.size());
+						this_success = true;
+					}
+				}
+			}
+		}
+
+		else if(index % 2) // Postfixes (before prefixes)
+		{
+			for(auto& postfix_type : postfixes)
+			for(string& postfix : postfix_type.second)
+			{
+				if(ends_with(root, postfix) && static_cast<double>(root.size()) / static_cast<double>(postfix.size()) > 1.8)
+				{
+					root = root.substr(0, root.size() - postfix.size());
+					this_success = true;
+				}
+			}
+		}
+
+		else // Prefixes
+		{
+			for (auto& prefix_type : prefixes)
+			for (string& prefix : prefix_type.second)
+			{
+				if (starts_with(root, prefix) && static_cast<double>(root.size()) / static_cast<double>(prefix.size()) > 1.3)
+				{
+					root = Slice(root, prefix.size(), root.size());
+					this_success = true;
+				}
+			}
+		}
+		if (!this_success) times_no_success++;
+		index++;
 	}
 
 	return  root;
@@ -296,4 +347,48 @@ void Language::print_frequent_postfixes(size_t num)
 		if (p.second >= num)	cout << p.first << " : " << p.second << endl;
 		else break;
 	}
+}
+
+bool Language::ends_with(string& s, string& postfix) noexcept
+{
+	if (postfix.size() > s.size()) return false;
+	const size_t offset = s.size() - postfix.size();
+	for(size_t i = 0; i < postfix.size(); i++)
+	{
+		if(s[i + offset] != postfix[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Language::starts_with(string& s, string& prefix) noexcept
+{
+	if (prefix.size() > s.size()) return false;
+	for(size_t i = 0; i < prefix.size(); i ++)
+	{
+		if(s.at(i) != prefix.at(i))
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+void Language::load_prestfixes()
+{
+	// File_paths:
+	const char endings_path[] = "res/language/input/endings.txt";
+	const char postfixes_path[] = "res/language/input/postfixes.txt";
+	const char prefixes_path [] = "res/language/input/prefixes.txt";
+	
+	string raw_endings_data = readFile(endings_path);
+	string raw_postfixes_data = readFile(postfixes_path);
+	string raw_prefixes_data = readFile(prefixes_path);
+
+	endings = extract(raw_endings_data);
+	postfixes = extract(raw_postfixes_data);
+	prefixes = extract(raw_prefixes_data);
 }
