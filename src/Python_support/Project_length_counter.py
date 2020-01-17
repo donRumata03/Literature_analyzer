@@ -104,8 +104,8 @@ def store_data(data):
 
 
 #######     For user:   ##############################################################################
-code_file_extensions = [".py", ".cpp", ".h", "hpp", ".c"]                                            #
-path_0 = "D:\\cpp_func\\"                                                                            #
+code_file_extensions = [".cpp", ".h", "hpp", ".c"]                                            #
+path_0 = "D:\\Projects\\Literature_analyzer\\"                                                                            #
 data_path = "D:\\Projects\\Literature_analyzer\\src\\Python_support\\project_stat.json"              #
 renewing_time = 10  # Seconds (2 min default)                                                        #
 offset_delay_time = 1200                                                                             #

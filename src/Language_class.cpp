@@ -1,8 +1,13 @@
 #include "Language_class.h"
 
 
+// Constructor
+
 Language::Language(const char filename[]) {
+
+	Timer tim;
 	single_data = readFile(filename);
+	cout << "Read file! ( " << tim.get_time() << " ms )" << endl;;
 
 	map<string, size_t> postfixes_counter;
 	map<string, size_t> prefixes_counter;
@@ -14,6 +19,7 @@ Language::Language(const char filename[]) {
 	uint char_index = 0;
 	vector<pair<string, free_properties>> free_properties_to_add;
 
+	Timer getting_blocks;
 	
 	for (char c : single_data) {
 		this_block_empty = true;
@@ -104,27 +110,21 @@ Language::Language(const char filename[]) {
 		last = c;
 	}
 
-
-	// Test of generating free properties;
-	/*
-	cout << "Test of generating free properties:" << endl;
-	for(auto& i : free_properties_to_add)
-	{
-		cout << i.first << " " << free_properties_to_string_converter[i.second] << endl;
-	}
-
-	cout << "End of test of generating free properties : " << endl;
-	*/
-
+	cout << "Got blocks! ( " << getting_blocks.get_time() << " ms )" << endl;
 	
 	// So, here we already have a Word blocks.
 	// We should merge the ones with this same ROOTS
 	// Firstable, sort them by root:
+	Timer sorting;
 	sort(_word_blocks.begin(), _word_blocks.end(), [&](auto& a, auto& b) {return a.root < b.root; });
 
+	cout << "Sorted! ( " << sorting.get_time() << " ms )" << endl;
+	
 	// After that: merging
 	size_t block_index = 0;
 	long long prev_index = -1;
+
+	Timer merging;
 	
 	Word_family* flying_block = nullptr;
 	for(Word_family &temp : _word_blocks)	{
@@ -154,11 +154,15 @@ Language::Language(const char filename[]) {
 		}
 	}
 
+	cout << "Merged! ( " << merging.get_time() << " ms )" << endl;
+
 	// Free temporary memory
 	vector<Word_family>().swap(_word_blocks);
 
 
 	/*ADDING FREE PROPERTIES*/
+
+	Timer word_making;
 	
 	// Go through all blocks and add pointers to word_getter
 	for(auto& this_block : this->family_getter)
@@ -183,37 +187,82 @@ Language::Language(const char filename[]) {
 		}
 	}
 
+	cout << "Made word and block getters! ( " << word_making.get_time() << " ms )" << endl;
+	
 	// Sort prefixes and postfixes
+	Timer sorinting_prestfixes;
 	for(auto& p : prefixes_counter) if(p.second > MAX_IGNORE_NUMBER_OF_PREFIXES_AND_POSTFIXES) this->sorted_prefixes.emplace_back(p.first, p.second);
 	for(auto& p : postfixes_counter) if (p.second > MAX_IGNORE_NUMBER_OF_PREFIXES_AND_POSTFIXES) this->sorted_postfixes.emplace_back(p.first, p.second);
 	sort(sorted_prefixes.begin(), sorted_prefixes.end(), [](auto& a, auto& b) { return a.second > b.second; });
 	sort(sorted_postfixes.begin(), sorted_postfixes.end(), [](auto& a, auto& b) { return a.second > b.second; });
-
+	cout << "Sorted prefixes and postfixes! ( " << sorinting_prestfixes.get_time() << " ms )" << endl;
 	this->load_prestfixes();
 }
 
-word_common_struct Language::analyze_word(string& word)
+
+
+
+// Cutting prestfixes:
+
+word_dividing_struct Language::analyze_word(string& word) // With memorizing
 {
-	auto [success, root] = get_root(word);
-	if(success)
+	// TODO Make analyzing word
+	return word_dividing_struct{};
+}
+
+pair<string, string> Language::simple_mem_step(const string& root, int type)
+{
+	bool this_success = false;
+
+	if (type == 0) // ending
 	{
-		const size_t first_pos = word.find(root);
-
-		if (first_pos != string::npos) {
-			const string this_prefix = Slice(word, 0, first_pos);
-			const string this_postfix = Slice(word, first_pos + root.length(), word.length());
-
-			word_common_struct res {"", root, ""};
-			
-			if (first_pos != 0) res.prefix = this_prefix;
-			if (first_pos + root.length() != word.length()) res.postfix = this_postfix;
-
-			return res;
-		}
+		for (auto& ending_type : endings)
+			for (string& ending : ending_type.second)
+			{
+				if (ends_with(root, ending))
+				{
+					if (root.size() >= 4 || ending.size() <= 2 || (static_cast<double>(root.size()) / ending.size() > 2.5)) {
+						string new_root = root.substr(0, root.size() - ending.size());
+						return { new_root, ending };
+					}
+				}
+			}
 	}
 
-	return {"", "", ""};
+	else if (type == 1) // Postfixes (before prefixes)
+	{
+		for (auto& postfix_type : postfixes)
+			for (string& postfix : postfix_type.second)
+			{
+				if (ends_with(root, postfix) && static_cast<double>(root.size()) / static_cast<double>(postfix.size()) > 1.1)
+				{
+					string new_root = root.substr(0, root.size() - postfix.size());
+					return { new_root, postfix };
+				}
+			}
+	}
 
+	else // Prefixes
+	{
+		bool prev_root_exists = word_exists(root);
+
+		cout << "Cutting prefix : " << root << " ( " << prev_root_exists << " )" << endl;
+
+		for (auto& prefix_type : prefixes)
+		for (string& prefix : prefix_type.second)
+		{
+			if (starts_with(root, prefix) && static_cast<double>(root.size()) / static_cast<double>(prefix.size()) > 1.3)
+			{
+				string temp_root = Slice(root, prefix.size(), root.size());
+				bool temp_root_exists = word_exists(temp_root);
+
+				cout << "Root : " << temp_root << " : " << temp_root_exists << endl;
+
+				if (!prev_root_exists || temp_root_exists) { return {temp_root, prefix}; }
+			}
+		}
+	}
+	return {root, ""};
 }
 
 string Language::cut_prestfixes(string& word)
@@ -223,7 +272,7 @@ string Language::cut_prestfixes(string& word)
 
 	short times_no_success = 0;
 	
-	while(!root.empty() && !(is_main_form(root)) && times_no_success <= 3) // If root in roots: return
+	while(!root.empty() && times_no_success <= 3) // If root in roots: return
 	{
 		// For all frequent prefixes try to understand if they exist
 		// If they do, we add 1 to their frequency rating
@@ -264,13 +313,21 @@ string Language::cut_prestfixes(string& word)
 
 		else // Prefixes
 		{
+			bool prev_root_exists = word_exists(root);
+			cout << root << " : " << prev_root_exists << endl;
 			for (auto& prefix_type : prefixes)
 			for (string& prefix : prefix_type.second)
 			{
 				if (starts_with(root, prefix) && static_cast<double>(root.size()) / static_cast<double>(prefix.size()) > 1.3)
 				{
-					root = Slice(root, prefix.size(), root.size());
-					this_success = true;
+					string temp_root = Slice(root, prefix.size(), root.size());
+					bool temp_root_exists = word_exists(temp_root);
+					cout << temp_root << " : " << temp_root_exists << endl;
+					if (!prev_root_exists || temp_root_exists)
+					{
+						this_success = true;
+						root = temp_root;
+					}
 				}
 			}
 		}
@@ -281,13 +338,274 @@ string Language::cut_prestfixes(string& word)
 	return  root;
 }
 
+void Language::recursive_step(const string& root, int type, vector<string> & to_append, set<string>& root_set)
+{
+	bool this_success = false;
+
+	if (type == 0) // ending
+	{
+		for (auto& ending_type : endings)
+		for (string& ending : ending_type.second)
+		{
+			if (ends_with(root, ending))
+			{
+				if (root.size() >= 4 || ending.size() <= 2 || (static_cast<double>(root.size()) / ending.size() > 2.5)) {
+					string new_root = root.substr(0, root.size() - ending.size());
+					if(root_set.find(new_root) == end(root_set)) to_append.push_back(new_root);
+					root_set.insert(new_root);
+				}
+			}
+		}
+	}
+
+	else if (type == 1) // Postfixes (before prefixes)
+	{
+		for (auto& postfix_type : postfixes)
+		for (string& postfix : postfix_type.second)
+		{
+			if (ends_with(root, postfix) && static_cast<double>(root.size()) / static_cast<double>(postfix.size()) > 1.1)
+			{
+				string new_root = root.substr(0, root.size() - postfix.size());
+				if (root_set.find(new_root) == end(root_set)) to_append.push_back(new_root);
+				root_set.insert(new_root);
+			}
+		}
+	}
+
+	else // Prefixes
+	{
+		bool prev_root_exists = word_exists(root);
+
+		cout << "Cutting prefix : " << root << " ( " << prev_root_exists << " )" << endl;
+
+		for (auto& prefix_type : prefixes)
+		for (string& prefix : prefix_type.second)
+		{
+			if (starts_with(root, prefix) && static_cast<double>(root.size()) / static_cast<double>(prefix.size()) > 1.3)
+			{
+				string temp_root = Slice(root, prefix.size(), root.size());
+
+				if(root_set.find(temp_root) != root_set.end()) continue;
+				
+				bool temp_root_exists = word_exists(temp_root);
+
+				cout << "Root : " << temp_root << " : " << temp_root_exists << endl;
+				
+				if (!prev_root_exists || temp_root_exists) { to_append.push_back(temp_root); root_set.insert(temp_root); }
+
+			}
+		}
+	}
+}
+
+void Language::mem_recursive_step(const string& root, int type, vector<string>& to_append, set<string>& root_set, vector<string>& history)
+{
+	bool this_success = false;
+	
+	if (type == 0) // ending
+	{
+		for (auto& ending_type : endings)
+			for (string& ending : ending_type.second)
+			{
+				if (ends_with(root, ending))
+				{
+					if (root.size() >= 4 || ending.size() <= 2 || (static_cast<double>(root.size()) / ending.size() > 2.5)) {
+						string new_root = root.substr(0, root.size() - ending.size());
+						if (root_set.find(new_root) == end(root_set)) to_append.push_back(new_root);
+						root_set.insert(new_root);
+						history.push_back(ending);
+					}
+				}
+			}
+	}
+
+	else if (type == 1) // Postfixes (before prefixes)
+	{
+		for (auto& postfix_type : postfixes)
+			for (string& postfix : postfix_type.second)
+			{
+				if (ends_with(root, postfix) && static_cast<double>(root.size()) / static_cast<double>(postfix.size()) > 1.1)
+				{
+					string new_root = root.substr(0, root.size() - postfix.size());
+					if (root_set.find(new_root) == end(root_set)) to_append.push_back(new_root);
+					root_set.insert(new_root);
+					history.push_back(postfix);
+				}
+			}
+	}
+
+	else // Prefixes
+	{
+		if (history.size() >= MAX_PREFIX_NUMBER) { cout << "Interesting word with many prefixes: " << root << Join(" ", history) << endl; return; }
+		bool prev_root_exists = word_exists(root);
+
+		cout << "Cutting prefix : " << root << " ( " << prev_root_exists << " )" << endl;
+
+		for (auto& prefix_type : prefixes)
+			for (string& prefix : prefix_type.second)
+			{
+				if (starts_with(root, prefix) && static_cast<double>(root.size()) / static_cast<double>(prefix.size()) > 1.3)
+				{
+					string temp_root = Slice(root, prefix.size(), root.size());
+
+					if (root_set.find(temp_root) != root_set.end()) continue;
+
+					bool temp_root_exists = word_exists(temp_root);
+
+					cout << "Root : " << temp_root << " : " << temp_root_exists << endl;
+
+					if (!prev_root_exists || temp_root_exists) { to_append.push_back(temp_root); root_set.insert(temp_root); }
+
+				}
+			}
+	}
+}
+
+vector<string> Language::simple_parse_step(const string& root, int type)
+{
+	bool this_success = false;
+	vector<string> res;
+	
+	if (type == 0) // ending
+	{
+		for (auto& ending_type : endings)
+			for (string& ending : ending_type.second)
+			{
+				if (ends_with(root, ending))
+				{
+					if (root.size() >= 4 || ending.size() <= 2 || (static_cast<double>(root.size()) / ending.size() > 2.5)) {
+						string new_root = root.substr(0, root.size() - ending.size());
+						res.push_back(new_root);
+					}
+				}
+			}
+	}
+
+	else if (type == 1) // Postfixes (before prefixes)
+	{
+		for (auto& postfix_type : postfixes)
+			for (string& postfix : postfix_type.second)
+			{
+				if (ends_with(root, postfix) && static_cast<double>(root.size()) / static_cast<double>(postfix.size()) > 1.1)
+				{
+					string new_root = root.substr(0, root.size() - postfix.size());
+					res.push_back(new_root);
+				}
+			}
+	}
+
+	else // Prefixes
+	{
+		bool prev_root_exists = word_exists(root);
+
+		cout << "Cutting prefix : " << root << " ( " << prev_root_exists << " )" << endl;
+
+		for (auto& prefix_type : prefixes)
+			for (string& prefix : prefix_type.second)
+			{
+				if (starts_with(root, prefix) && static_cast<double>(root.size()) / static_cast<double>(prefix.size()) > 1.3)
+				{
+					string temp_root = Slice(root, prefix.size(), root.size());
+					bool temp_root_exists = word_exists(temp_root);
+
+					cout << "Root : " << temp_root << " : " << temp_root_exists << endl;
+
+					if (!prev_root_exists || temp_root_exists) res.push_back(temp_root);
+				}
+			}
+	}
+	return res;
+}
+
+string Language::recursive_cut_prestfixes(string& word)
+{
+	string root = word;
+
+	// To begin with, find possible prefixes cutting
+	vector<string> after_cutting_prefixes { root };
+	set<string> prefix_set { root };
+	size_t buff_size = -1;
+	while(after_cutting_prefixes.size() != buff_size)
+	{
+		buff_size = after_cutting_prefixes.size();
+		for(size_t i = 0; i < buff_size; i++)
+		{
+			recursive_step(after_cutting_prefixes.at(i), 2, after_cutting_prefixes, prefix_set);
+		}
+	}
+
+	cout << "Variants after cutting : ";
+	print(after_cutting_prefixes);
+	cout << endl;
+	// Find the shortest String:
+	for(auto& s : after_cutting_prefixes) if(root.size() > s.size()) root = s;
+	cout << "best_without_prefixes : " << root << endl;
+
+
+	
+	// Cut endings : find the strongest cutting
+	vector<string> cutting_endings = simple_parse_step(root, 0);
+	for (auto& s : cutting_endings) if (root.size() > s.size()) root = s;
+	cout << "After cutting endings : " << root << endl;
+
+
+	
+	// Recursive cut postfixes
+
+	vector<string> after_cutting_postfixes { root };
+	set<string> postfix_set{ root };
+	buff_size = -1;
+	while (after_cutting_postfixes.size() != buff_size)
+	{
+		buff_size = after_cutting_postfixes.size();
+		for (size_t i = 0; i < buff_size; i++)
+		{
+			recursive_step(after_cutting_postfixes.at(i), 1, after_cutting_postfixes, postfix_set);
+		}
+	}
+
+	cout << "Variants after cutting : ";
+	print(after_cutting_postfixes);
+	cout << endl;
+
+	for (auto& s : after_cutting_postfixes) if (root.size() > s.size()) root = s;
+	cout << "best_without_postfixes : " << root << endl;
+	
+
+	/*
+	while (!root.empty() && times_no_success <= 3) // If root in roots: return
+	{
+		// For all frequent prefixes try to understand if they exist
+		// If they do, we add 1 to their frequency rating
+		// We should re - count frequent verbs in oder to understand their real percent
+		// 
+		// Each time we renew it we sort all known, good enough prepositions and find best ones
+		// But if we see something good it`s not necessary to wait re-counting
+
+		vector<string> this_result;
+		
+		if (index == 0) this_result = recursive_step(root, 0);
+		else if (index % 2) this_result = recursive_step(root, 1);
+		else this_result = recursive_step(root, 2);
+		bool this_success = !this_result.empty();
+		
+		if (!this_success) times_no_success++;
+		index++;
+	}
+	*/
+
+	return  root;
+}
+
+
+// Simple helpers
+
 void Language::print_data() {
 	cout << "THIS LANGUAGE: {" << endl << "Blocks: " << endl;
 	for (auto block : word_blocks) {
 		block->print_data();
 	}
 }
-
 
 pair<bool, Word_family*> Language::get_family(string& word) {
 	bool success = true;
@@ -349,7 +667,7 @@ void Language::print_frequent_postfixes(size_t num)
 	}
 }
 
-bool Language::ends_with(string& s, string& postfix) noexcept
+bool Language::ends_with(const string& s, string& postfix) noexcept
 {
 	if (postfix.size() > s.size()) return false;
 	const size_t offset = s.size() - postfix.size();
@@ -363,7 +681,7 @@ bool Language::ends_with(string& s, string& postfix) noexcept
 	return true;
 }
 
-bool Language::starts_with(string& s, string& prefix) noexcept
+bool Language::starts_with(const string& s, string& prefix) noexcept
 {
 	if (prefix.size() > s.size()) return false;
 	for(size_t i = 0; i < prefix.size(); i ++)

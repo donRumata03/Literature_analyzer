@@ -69,7 +69,7 @@ void word_top::print_if_more_than(uint64_t num)
 }
 
 
-double word_top::dist(word_top t1, word_top t2)
+double word_top::dist(word_top& t1, word_top &t2)
 {
 	set<string> words;
 	for (auto p : t1.data) {
@@ -85,8 +85,8 @@ double word_top::dist(word_top t1, word_top t2)
 		uint64_t times_in_1 = (t1.data.find(word) == t1.data.end()) ? (0) : (t1.data[word]);
 		uint64_t times_in_2 = (t2.data.find(word) == t2.data.end()) ? (0) : (t2.data[word]);
 		
-		double percent_in_1 = (double)times_in_1 / t1.size;
-		double percent_in_2 = (double)times_in_2 / t2.size;
+		double percent_in_1 = static_cast<double>(times_in_1) / t1.size;
+		double percent_in_2 = double(times_in_2) / t2.size;
 		if (square(percent_in_1 - percent_in_2) > pow(10, (-7))) { cout << word << " " \
 			<< percent_in_1 << " " << times_in_1 << " " << percent_in_2 << " " << times_in_2 << endl; }
 		difference += square(percent_in_1 - percent_in_2);

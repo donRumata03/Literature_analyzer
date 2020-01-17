@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include <sstream>
 
 int count_sentensies(string& s);
 int count_points(string& s);
@@ -102,7 +103,7 @@ template<>
 string join<vector<string>>(string splitter, vector<string>& container);
 
 
-template<class T> T Slice(T& container, uint idx_beg, uint idx_end) {
+template<class T> T Slice(const T& container, uint idx_beg, uint idx_end) {
 	T result;
 	for (uint idx = idx_beg; idx < idx_end; idx++) {
 			result.push_back(container.at(idx));
@@ -116,6 +117,7 @@ template<class T> T Slice(T& container, uint idx_beg, uint idx_end) {
 string cut_spaces(string& s);
 string cut_bad_symbols(string& s);
 vector<string> split(const string& s, const initializer_list<char>&& split_by = initializer_list{ ' ', '\n', '\t', '\r' });
+inline vector<string> split(const string& s, const vector<char>& split_by);
 vector<string> split_lines(string& s);
 
 size_t find_first_not_english(string& s, size_t offset = 0);
@@ -138,9 +140,6 @@ template<class T> auto find_first_for_which_true(string& ss, T function, size_t 
 template<class T, class E>
 auto my_lang_extract(string& s, T index_type_descriptor, E data_type_descriptor) -> map<string, vector<string>>
 {
-
-
-	
 	auto string_splitters = { '\n' };
 	size_t char_index = 0;
 	char c = s[0];
@@ -182,3 +181,6 @@ auto my_lang_extract(string& s, T index_type_descriptor, E data_type_descriptor)
 	return result;
 }
 
+
+map<string, vector<string>> common_mylang_parse(string& s, initializer_list<char>&& additioonal_data_ignore_symbols = { ';', ',' }, initializer_list<char>&& space_ignore = {';', ','});
+map<string, vector<double>> double_mylang_parse(string& s, initializer_list<char>&& additioonal_data_ignore_symbols = { ';', ',' }, initializer_list<char>&& space_ignore = { ';', ',' });

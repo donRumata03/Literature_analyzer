@@ -9,8 +9,12 @@ int main() {
 	system("cls");
 	setlocale(LC_ALL, "Russian");
 
+	/*
 	Scenery s;
-	s.clever_prefix_cutter();
+	s.very_clever_prefix_cutter();
+	*/
+
+	Scenery::analitic_recall();
 	
 	return 0;
 }

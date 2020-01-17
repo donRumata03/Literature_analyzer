@@ -127,6 +127,11 @@ string cut_bad_symbols(string& s)
 
 
 vector<string> split(const string &s, const initializer_list<char> &&split_by) {
+	return split(s, vector(split_by));
+}
+
+vector<string> split(const string& s, const vector<char>& split_by)
+{
 	vector<string> result;
 	uint last_word_beg = 0;
 	bool in_word = false;
@@ -160,7 +165,7 @@ vector<string> split(const string &s, const initializer_list<char> &&split_by) {
 		index++;
 	}
 
-	if (!in(s[len - 1], split_by)) { // // add last word
+	if (!s.empty() && !in(s[len - 1], split_by)) { // // add last word
 		this_length = index - last_word_beg;
 		string this_word;
 		this_word.reserve(this_length);
@@ -168,11 +173,10 @@ vector<string> split(const string &s, const initializer_list<char> &&split_by) {
 			this_word.push_back(s[i]);
 		}
 		result.push_back(this_word);
-	} 
-	if(!result.empty())	return result;
+	}
+	if (!result.empty())	return result;
 	return vector<string>();
 }
-
 
 
 template<>
@@ -199,4 +203,75 @@ size_t find_first_russian(string& s, size_t offset)
 {
 	return find_first_for_which_true(s, [](char c) {	return is_russian(c); }, offset);
 }
+
+map<string, vector<string>> common_mylang_parse(string& s, initializer_list<char>&& data_ignore, initializer_list<char>&& space_ignore)
+{
+	vector<char> resultive_data_ignore = {' ', '\n', '\t', '\r'};
+	for(auto& p : data_ignore) resultive_data_ignore.push_back(p);
+	auto string_splitters = {'\n'};
+	size_t char_index = 0;
+	char c = s[0];
+
+	map<string, vector<string>> result;
+
+	while (char_index < s.size())
+	{
+		c = s[char_index];
+		if (c == '/') // It`s a comment string => find the next one
+		{
+			while (!in(c, string_splitters))
+			{
+				char_index++;
+				c = s[char_index];
+			}
+			char_index = s.find_first_not_of(string_splitters, char_index);
+		}
+		else if (!is_spaceive(c) && !in(c, space_ignore))
+		{
+			// It`s the name of block
+			const size_t prev_index = char_index;
+			size_t name_end_index = s.find('{', char_index);
+			string raw_name = Slice(s, prev_index, name_end_index);
+			assert((split(raw_name).size() == 1) && "Invalid syntax: name contains spacieve symbols!");
+			string this_name = cut_spaces(raw_name);
+			size_t data_beg = name_end_index + 1;
+			size_t data_end = s.find('}', name_end_index);
+			auto data_to_split = Slice(s, data_beg, data_end);
+			auto data = split(data_to_split, resultive_data_ignore);
+
+			result[this_name] = data;
+
+			char_index = data_end + 1;
+		}
+		else
+		{
+			char_index++;
+		}
+	}
+	return result;
+}
+
+map<string, vector<double>> double_mylang_parse(string& s, initializer_list<char>&& additioonal_data_ignore_symbols, initializer_list<char>&& space_ignore)
+{
+	auto raw_coeff = common_mylang_parse(s);
+	map<string, vector<double>> fried_coeff;
+
+	stringstream ss;
+	
+	for (auto& p : raw_coeff)
+	{
+		vector<double> this_vals;
+		for (auto v: p.second) {
+			// ss << Join("", v);
+			ss << v;
+			double this_val;
+			ss >> this_val;
+			ss.clear();
+			this_vals.push_back(this_val);
+		}
+		fried_coeff[p.first] = move(this_vals);
+	}
+	return fried_coeff;
+}
+
 

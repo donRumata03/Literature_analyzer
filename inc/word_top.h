@@ -12,8 +12,10 @@ class word_top {
 public:
 	word_top() = default;
 	word_top(str& s);
+	word_top(string& s) : word_top(*new str(s)) {}
 
 	void print_first(int n);
 	void print_if_more_than(uint64_t num);
-	static double dist(word_top t1, word_top t2);
+	static double dist(word_top& t1, word_top &t2);
+	static map<string, vector<double>> coeffs;
 };

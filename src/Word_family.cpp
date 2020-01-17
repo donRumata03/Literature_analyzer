@@ -30,9 +30,11 @@ string Word_family::get_root() {
 	if(res.empty())
 	{
 		res = this->main_form.data;
+		/*
 		cout << "Interesting word: " << res << endl;
 		this->print_words();
 		cout << endl;
+		*/
 	}
 	// cout << "Root is: " << res << endl;
 	return res;

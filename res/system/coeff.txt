@@ -1,2 +1,5 @@
-word_top { 1.0 };
-simple_analitics {}
+word_top { ;1.0 ,,,,, 1290.212 ;1;66656.5;423.3};
+simple_analitics { 4.7 ,; 	10.8908             };,
+
+;uotwhiufgiuhgkhgkgshfh0239850hf {};
+rebsyb jsdfhejf{};;

@@ -145,7 +145,7 @@ void Simple_analitics::print_it() {
 	cout << "That`s all for now" << endl;
 }
 
-double Simple_analitics::dist(Simple_analitics s1, Simple_analitics s2) {
+double Simple_analitics::dist(Simple_analitics& s1, Simple_analitics &s2) {
 	return 1;
 }
 

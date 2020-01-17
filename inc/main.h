@@ -15,5 +15,5 @@
 #include "file_walker.h"
 #include "Scenery.h"
 #include "Matrix_optimize.h"
-
+#include "Analitics.h"
 

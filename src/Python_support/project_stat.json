@@ -1,11 +1,17 @@
 {
     "data": [
         {
-            "Average line length": 23.5,
-            "Total number of lines in project": 896,
-            "Total number of symbols in project": 21043,
+            "Average line length": 24.2,
+            "Total number of lines in project": 2560,
+            "Total number of symbols in project": 61862,
             "time": 0
+        },
+        {
+            "Average line length": 24.2,
+            "Total number of lines in project": 2560,
+            "Total number of symbols in project": 61862,
+            "time": 10.642898559570312
         }
     ],
-    "reference point": 63713868138.12616
+    "reference point": 63714726610.43261
 }

@@ -11,9 +11,11 @@ private:
 public:
 
 	Scenery() = default;
-	
+	static void analitic_recall();
 	static void perstfix_cutter();
 	void clever_prefix_cutter();
+	void very_clever_prefix_cutter();
 	static void fs_test();
+	void analitic_test();
 	void doOld();
 };

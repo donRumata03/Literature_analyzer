@@ -24,13 +24,13 @@ public:
 	Simple_analitics() = default;
 	Simple_analitics(str &s);
 	Simple_analitics(str &s, string _label);
+	Simple_analitics(string& s) : Simple_analitics(*new str(s)) {}
 
 	void print_it();
-	void visualize_word_distribution();
 	void visualize_sentence_distribution();
-	void print_word_distribution();
 	void print_sentence_distribution();
 
-	static double dist(Simple_analitics s1, Simple_analitics s2);
+	static map<string, vector<double>> coeffs;
+	static double dist(Simple_analitics& s1, Simple_analitics& s2);
 };
 
